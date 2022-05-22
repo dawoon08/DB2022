@@ -1,0 +1,93 @@
+import java.sql.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.DefaultTableModel;
+
+public class SearchPrice extends JFrame {
+	private PreparedStatement pstmt;
+	private ResultSet rset;
+	
+	private String type;
+	private int minPrice, maxPrice; 
+	private String area;
+	
+	Container contentPane = getContentPane();
+	String header[] = {"종류", "비용", "보증금", "건물명", "주거 유형", "매물 나온 날짜", "매물 위치"};
+	DefaultTableModel model = new DefaultTableModel(header, 0);
+	JTable table = new JTable(model);
+	JScrollPane sc = new JScrollPane(table);
+	DefaultTableModel m = (DefaultTableModel)table.getModel();
+
+	public void setArea(String area) {
+		this.area = area;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public void setPrice(int minPrice, int maxPrice) { 
+	  	this.minPrice = minPrice;
+	  	this.maxPrice = maxPrice;
+		}
+	
+	public void searchResult() {
+		try {   Connection conn = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/db2022team11", "db2022team11", "db2022team11");
+				Statement stmt = conn.createStatement();
+				
+				
+					try { //transaction
+						conn.setAutoCommit(false);
+						//검색 쿼리
+						pstmt = conn.prepareStatement("select rent_type, price, deposit, building_name, building_type, sale_date, address from DB2022_SALE,"
+								+area+ " where DB2022_SALE.building_id = "+area+".building_id and rent_type = ? and price >= ? and price <= ? "); 
+						pstmt.setString(1, type);
+						pstmt.setInt(2, minPrice);
+						pstmt.setInt(3, maxPrice);
+					    rset = pstmt.executeQuery();
+					    
+					    contentPane.add(sc);
+	
+						//검색 결과 출력
+						while(rset.next()) {
+							String []record = new String[7];
+							record[0] = rset.getString("rent_type");
+							record[1] = Integer.toString(rset.getInt("price"));
+							record[2] = Integer.toString(rset.getInt("deposit"));
+							record[3] = rset.getString("building_name");
+							record[4] = rset.getString("building_type");
+							record[5] = rset.getString("sale_date");
+							record[6] = rset.getString("address");
+							model.addRow(record);
+							System.out.println(record[6]);
+						}
+						
+						
+
+						conn.commit();
+					} catch(SQLException se) {
+						se.printStackTrace();
+						System.out.println("Rolling back data here");
+							try {	
+									if(conn!=null)
+									conn.rollback();
+							}catch(SQLException se2) {
+								se2.printStackTrace();
+							}
+					}
+			
+					conn.setAutoCommit(true);
+		
+		
+		}catch(SQLException se) {
+			se.printStackTrace();
+		}
+		System.out.println("Goodbye!");
+	}
+	
+	
+}
+

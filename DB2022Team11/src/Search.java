@@ -10,6 +10,8 @@ import java.sql.Statement;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 public class Search extends JFrame{
 	
@@ -26,14 +28,27 @@ public class Search extends JFrame{
 	JTextField maxPrice = new JTextField(10);
 	Button enter = new Button("Enter");
 	//결과 출력 테이블 생성
-	String header[] = {"종류", "비용", "보증금", "건물명", "주거 유형", "매물 나온 날짜", "매물 위치"};
+	String header[] = {"종류", "비용", "보증금", "건물명", "주거 유형", "날짜", "매물 위치"};
 	DefaultTableModel model = new DefaultTableModel(header, 0);
 	JTable table = new JTable(model);
-	DefaultTableModel m = (DefaultTableModel)table.getModel();
-	JScrollPane sc = new JScrollPane(table);
 	
-	public Search() { //frame 생성자
-		
+	JScrollPane sc = new JScrollPane(table);
+
+	public Search() { 
+		JMenuBar m = new JMenuBar();
+        setJMenuBar( m );
+            
+        JMenu m_search = new JMenu("매물 검색");     
+        JMenu m_seeAll = new JMenu("전체 매물 보기"); 
+        m.add(m_search);		m.add(m_seeAll);
+        
+        JMenuItem i_area = new JMenuItem("지역별"); 
+        JMenuItem i_type = new JMenuItem("종류별");
+        JMenuItem i_price = new JMenuItem("비용별");
+        m_search.add(i_area);
+        m_search.add(i_type);
+        m_search.add(i_price);
+        
 		setTitle("매물 검색");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -48,10 +63,22 @@ public class Search extends JFrame{
 		
 	    contentPane.add(minPrice);
 		contentPane.add(new JLabel("만원 이상"));
+		minPrice.addKeyListener(new MyKeyListener());
 		contentPane.add(maxPrice);
 		contentPane.add(new JLabel("만원 이하"));
+		maxPrice.addKeyListener(new MyKeyListener());
 		contentPane.add(enter);
 		enter.addActionListener(new MyActionListener());
+		enter.addKeyListener(new MyKeyListener());
+		
+		TableColumnModel columnModel = table.getColumnModel();
+		columnModel.getColumn(0).setPreferredWidth(40);
+		columnModel.getColumn(1).setPreferredWidth(50);
+		columnModel.getColumn(2).setPreferredWidth(40);
+		columnModel.getColumn(3).setPreferredWidth(50);
+		columnModel.getColumn(4).setPreferredWidth(50);
+		columnModel.getColumn(5).setPreferredWidth(60);
+		columnModel.getColumn(6).setPreferredWidth(250);
 		contentPane.add(sc);
 		sc.setPreferredSize(new Dimension(600,250));
 		
@@ -59,13 +86,32 @@ public class Search extends JFrame{
 		setVisible(true);
 	}
 	
-	//버튼클릭이벤트
 	private class MyActionListener implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			Button b = (Button)e.getSource();
-			//버튼 클릭시 결과 출력
-			m.setRowCount(0);
+			model.setRowCount(0);
 			searchResult();
+		}
+	}
+	private class MyKeyListener implements KeyListener{
+		public void keyPressed(KeyEvent e) {
+			int key = e.getKeyCode(); 
+			if(key == KeyEvent.VK_ENTER) {
+				model.setRowCount(0);
+				searchResult();
+			}
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	
@@ -99,7 +145,6 @@ public class Search extends JFrame{
 						}
 					    rset = pstmt.executeQuery();
 					    
-					    
 						//검색 결과 출력
 						while(rset.next()) {
 							
@@ -112,7 +157,7 @@ public class Search extends JFrame{
 							input[5] = rset.getString("sale_date");
 							input[6] = rset.getString("address");
 							
-							m.addRow(input);
+							model.addRow(input);
 						}
 						conn.commit();
 						
