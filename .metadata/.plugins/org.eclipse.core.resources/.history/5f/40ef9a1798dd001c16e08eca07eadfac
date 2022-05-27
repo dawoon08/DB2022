@@ -15,7 +15,7 @@ import javax.swing.table.TableColumnModel;
 
 public class Search extends JFrame{
 	
-	private PreparedStatement pstmt;
+	private PreparedStatement pstmt
 	private ResultSet rset;
 	
 	JTextField area = new JTextField(15); //юс╫ц
