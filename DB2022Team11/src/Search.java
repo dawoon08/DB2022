@@ -13,10 +13,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+//지역, 매물 종류(매매, 전세, 월세), 비용 조건에 따른 매물 검색 기능 구현 클래스
 public class Search extends JFrame{
-	
-	private PreparedStatement pstmt;
-	private ResultSet rset;
 	
 	JTextField area = new JTextField(15); //임시
 	
@@ -45,6 +43,7 @@ public class Search extends JFrame{
 		
 		contentPane.add(area);
 		
+		//매매,전세,월세 선택
 		rent_type = new JComboBox(rentType);
 		contentPane.add(rent_type);
 		
@@ -58,6 +57,7 @@ public class Search extends JFrame{
 		enter.addActionListener(new MyActionListener());
 		enter.addKeyListener(new MyKeyListener());
 		
+		//결과 출력 테이블 
 		TableColumnModel columnModel = table.getColumnModel();
 		columnModel.getColumn(0).setPreferredWidth(40);
 		columnModel.getColumn(1).setPreferredWidth(50);
@@ -77,7 +77,7 @@ public class Search extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			Button b = (Button)e.getSource();
 			model.setRowCount(0);
-			searchResult();
+			searchResult(minPrice.getText(), maxPrice.getText(), area.getText(), (String)rent_type.getSelectedItem());
 		}
 	}
 	private class MyKeyListener implements KeyListener{
@@ -85,7 +85,7 @@ public class Search extends JFrame{
 			int key = e.getKeyCode(); 
 			if(key == KeyEvent.VK_ENTER) {
 				model.setRowCount(0);
-				searchResult();
+				searchResult(minPrice.getText(), maxPrice.getText(), area.getText(), (String)rent_type.getSelectedItem());
 			}
 		}
 
@@ -102,71 +102,54 @@ public class Search extends JFrame{
 		}
 	}
 	
-	//결과 출력 함수
-	public void searchResult() {
+	//입력 조건에 따른 결과 출력 함수
+	//지역, 매물 종류, 비용 입력받고 조건 만족하는 매물 정보를 결과 테이블에 추가
+	public void searchResult(String minPrice, String maxPrice, String area, String rentType) {
 	    
-	    String area_view = area.getText();
+		String area_view = area;
+		String min_price = minPrice;
+		String max_price = maxPrice;
+		String rent_type = rentType;
 	    
 		try {   Connection conn = DriverManager.getConnection(
 				"jdbc:mysql://localhost:3306/db2022team11", "db2022team11", "db2022team11");
 				
-					try { 
-						conn.setAutoCommit(false);
-						//검색 쿼리
-						pstmt = conn.prepareStatement("select rent_type, price, deposit, building_name, building_type, sale_date, address from DB2022_SALE join "
-								+area_view+ " on DB2022_SALE.building_id = "+area_view+".building_id where rent_type = ? and price >= ? and price <= ? "); 
-						pstmt.setString(1, (String)rent_type.getSelectedItem());
-						
-						if(minPrice.getText().isEmpty()) {
-							pstmt.setInt(2, 0);
-						}
-						else {
-							pstmt.setInt(2, Integer.parseInt(minPrice.getText()));
-						}
-						if(maxPrice.getText().isEmpty()) {
-							pstmt.setInt(3,  10000000);
-						}
-						else {
-							pstmt.setInt(3, Integer.parseInt(maxPrice.getText()));
-						}
-					    rset = pstmt.executeQuery();
-					    
-						//검색 결과 출력
-						while(rset.next()) {
-							
-							String[] input = new String[7];
-							input[0] = rset.getString("rent_type");
-							input[1] = Integer.toString(rset.getInt("price"));
-							input[2] = Integer.toString(rset.getInt("deposit"));
-							input[3] = rset.getString("building_name");
-							input[4] = rset.getString("building_type");
-							input[5] = rset.getString("sale_date");
-							input[6] = rset.getString("address");
-							
-							model.addRow(input);
-						}
-						conn.commit();
-						
-					} catch(SQLException se) {
-						se.printStackTrace();
-						System.out.println("Rolling back data here");
-							try {	
-									if(conn!=null)
-									conn.rollback();
-							}catch(SQLException se2) {
-								se2.printStackTrace();
-							}
-					}
-			
-					conn.setAutoCommit(true);
+		PreparedStatement pstmt = conn.prepareStatement(
+				"select rent_type, price, deposit, building_name, building_type, sale_date, address "
+				+ "from DB2022_SALE join "+area_view+ " on DB2022_SALE.building_id = "+area_view+".building_id "
+				+ "where rent_type = ? and price >= ? and price <= ? "); 
 		
-		
-		}catch(SQLException se) {
-			se.printStackTrace();
+		pstmt.setString(1, rent_type);
+		if(min_price.isEmpty()) {
+			pstmt.setInt(2, 0);
+		}else {
+			pstmt.setInt(2, Integer.parseInt(min_price));
 		}
-	}
+		if(max_price.isEmpty()) {
+			pstmt.setInt(3,  10000000);
+		}else {
+			pstmt.setInt(3, Integer.parseInt(max_price));
+		}
+	    ResultSet rset = pstmt.executeQuery();
+	    
+		//조건 만족하는 매물 정보를 배열에 저장, 테이블 row에 추가
+		while(rset.next()) {
+			String[] input = new String[7];
+			input[0] = rset.getString("rent_type");
+			input[1] = Integer.toString(rset.getInt("price"));
+			input[2] = Integer.toString(rset.getInt("deposit"));
+			input[3] = rset.getString("building_name");
+			input[4] = rset.getString("building_type");
+			input[5] = rset.getString("sale_date");
+			input[6] = rset.getString("address");
+			
+			model.addRow(input);
+		}
+	}catch(SQLException se) {
+		se.printStackTrace();
+	}}
 
-		
+	
 	public static void main(String[] args) {
 		Search search = new Search(); 
 	}

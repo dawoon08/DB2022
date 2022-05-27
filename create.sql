@@ -39,7 +39,7 @@ CREATE TABLE DB2022_BUILDING (
     foreign key(area_id) references DB2022_AREA(area_id)
 );
 
-#매물 정보 테이블(매물id, 부동산id, 집주인id, 지역id, 매물 유형, 비용, 보증금, 나온 날짜, 빌딩id)
+#매물 정보 테이블(매물id, 부동산id, 집주인id, 지역id, 매물 유형, 비용, 보증금, 나온 날짜, 빌딩id, 주소)
 CREATE TABLE DB2022_SALE (
     Pid char(6) not null,
     agency_id char(6) not null,
