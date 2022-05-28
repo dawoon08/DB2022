@@ -149,10 +149,5 @@ public class Search extends JFrame{
 		se.printStackTrace();
 	}}
 
-	
-	public static void main(String[] args) {
-		Search search = new Search(); 
-	}
-
 }
 
