@@ -15,8 +15,8 @@ import javax.swing.table.TableColumnModel;
 
 //지역, 매물 종류(매매, 전세, 월세), 비용 조건에 따른 매물 검색 기능 구현 클래스
 public class Search extends JFrame{
-	
-	JTextField area = new JTextField(15); //임시
+	String[] areaName = {"서대문구 대현동","서대문구 신촌동", "은평구 신사동", "마포구 연남동"};
+	JComboBox<String> area_gu;
 	
 	//매물 종류 선택 박스
 	String[] rentType= {"매매","전세","월세"};
@@ -41,13 +41,14 @@ public class Search extends JFrame{
 		contentPane.setLayout(new FlowLayout());
 		contentPane.setBackground(new Color(244,244,244));
 		
-		contentPane.add(area);
+		area_gu = new JComboBox(areaName);
+		contentPane.add(area_gu);
 		
 		//매매,전세,월세 선택
 		rent_type = new JComboBox(rentType);
 		contentPane.add(rent_type);
 		
-	    contentPane.add(minPrice);
+		contentPane.add(minPrice);
 		contentPane.add(new JLabel("만원 이상"));
 		minPrice.addKeyListener(new MyKeyListener());
 		contentPane.add(maxPrice);
@@ -77,7 +78,7 @@ public class Search extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			Button b = (Button)e.getSource();
 			model.setRowCount(0);
-			searchResult(minPrice.getText(), maxPrice.getText(), area.getText(), (String)rent_type.getSelectedItem());
+			searchResult(minPrice.getText(), maxPrice.getText(), (String)area_gu.getSelectedItem(), (String)rent_type.getSelectedItem());
 		}
 	}
 	private class MyKeyListener implements KeyListener{
@@ -85,7 +86,7 @@ public class Search extends JFrame{
 			int key = e.getKeyCode(); 
 			if(key == KeyEvent.VK_ENTER) {
 				model.setRowCount(0);
-				searchResult(minPrice.getText(), maxPrice.getText(), area.getText(), (String)rent_type.getSelectedItem());
+				searchResult(minPrice.getText(), maxPrice.getText(), (String)area_gu.getSelectedItem(), (String)rent_type.getSelectedItem());
 			}
 		}
 
@@ -105,12 +106,27 @@ public class Search extends JFrame{
 	//입력 조건에 따른 결과 출력 함수
 	//지역, 매물 종류, 비용 입력받고 조건 만족하는 매물 정보를 결과 테이블에 추가
 	public void searchResult(String minPrice, String maxPrice, String area, String rentType) {
-	    
-		String area_view = area;
+		String area_view = null;
 		String min_price = minPrice;
 		String max_price = maxPrice;
 		String rent_type = rentType;
 	    
+		switch(area) {
+		case "서대문구 대현동":
+			area_view = "daehyun_dong";
+			break;
+		case "서대문구 신촌동":
+			area_view = "sinchon_dong";
+			break;
+		case "은평구 신사동":
+			area_view = "sinsa_dong";
+			break;
+		case "마포구 연남동":
+			area_view = "yeonnam_dong";
+			break;
+			
+		}
+		
 		try {   Connection conn = DriverManager.getConnection(
 				"jdbc:mysql://localhost:3306/db2022team11", "db2022team11", "db2022team11");
 				

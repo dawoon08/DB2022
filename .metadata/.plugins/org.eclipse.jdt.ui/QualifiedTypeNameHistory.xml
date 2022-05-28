@@ -21,4 +21,5 @@
     <fullyQualifiedTypeName name="javax.swing.table.TableColumnModel"/>
     <fullyQualifiedTypeName name="java.awt.event.KeyListener"/>
     <fullyQualifiedTypeName name="Search.MyActionListener"/>
+    <fullyQualifiedTypeName name="java.awt.event.ItemListener"/>
 </qualifiedTypeNameHistroy>
