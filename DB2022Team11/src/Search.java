@@ -164,6 +164,10 @@ public class Search extends JFrame{
 	}catch(SQLException se) {
 		se.printStackTrace();
 	}}
+	
+	public static void main(String[] args) {
+		Search search = new Search();
+	}
 
 }
 
