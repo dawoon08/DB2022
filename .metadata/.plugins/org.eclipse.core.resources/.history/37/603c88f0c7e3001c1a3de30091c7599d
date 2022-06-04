@@ -15,8 +15,7 @@ import javax.swing.table.TableColumnModel;
 
 //지역, 매물 종류(매매, 전세, 월세), 비용 조건에 따른 매물 검색 기능 구현 클래스
 public class Search extends JFrame{
-	
-//	JTextField area = new JTextField(15); //지역 선택하는 체크박스로 수정
+	String[] areaName = {"서대문구 대현동","서대문구 신촌동", "은평구 신사동", "마포구 연남동"};
 	JComboBox<String> area_gu;
 	
 	//매물 종류 선택 박스
@@ -25,7 +24,7 @@ public class Search extends JFrame{
 	//최소 최대 비용
 	JTextField minPrice = new JTextField(10);
 	JTextField maxPrice = new JTextField(10);
-	Button enter = new Button("Enter");
+	RoundedButton enter = new RoundedButton("Enter");
 	//결과 출력 테이블 생성
 	String header[] = {"종류", "비용", "보증금", "건물명", "주거 유형", "날짜", "매물 위치"};
 	DefaultTableModel model = new DefaultTableModel(header, 0);
@@ -39,16 +38,17 @@ public class Search extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		Container contentPane = getContentPane();
-		contentPane.setLayout(new FlowLayout());
+		contentPane.setLayout(null);
 		contentPane.setBackground(new Color(244,244,244));
 		
+		area_gu = new JComboBox(areaName);
 		contentPane.add(area_gu);
 		
 		//매매,전세,월세 선택
 		rent_type = new JComboBox(rentType);
 		contentPane.add(rent_type);
 		
-	    contentPane.add(minPrice);
+		contentPane.add(minPrice);
 		contentPane.add(new JLabel("만원 이상"));
 		minPrice.addKeyListener(new MyKeyListener());
 		contentPane.add(maxPrice);
@@ -76,9 +76,9 @@ public class Search extends JFrame{
 	
 	private class MyActionListener implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
-			Button b = (Button)e.getSource();
+			RoundedButton b = (RoundedButton)e.getSource();
 			model.setRowCount(0);
-			searchResult(minPrice.getText(), maxPrice.getText(), area.getText(), (String)rent_type.getSelectedItem());
+			searchResult(minPrice.getText(), maxPrice.getText(), (String)area_gu.getSelectedItem(), (String)rent_type.getSelectedItem());
 		}
 	}
 	private class MyKeyListener implements KeyListener{
@@ -86,7 +86,7 @@ public class Search extends JFrame{
 			int key = e.getKeyCode(); 
 			if(key == KeyEvent.VK_ENTER) {
 				model.setRowCount(0);
-				searchResult(minPrice.getText(), maxPrice.getText(), area.getText(), (String)rent_type.getSelectedItem());
+				searchResult(minPrice.getText(), maxPrice.getText(), (String)area_gu.getSelectedItem(), (String)rent_type.getSelectedItem());
 			}
 		}
 
@@ -106,12 +106,27 @@ public class Search extends JFrame{
 	//입력 조건에 따른 결과 출력 함수
 	//지역, 매물 종류, 비용 입력받고 조건 만족하는 매물 정보를 결과 테이블에 추가
 	public void searchResult(String minPrice, String maxPrice, String area, String rentType) {
-	    
-		String area_view = area;
+		String area_view = null;
 		String min_price = minPrice;
 		String max_price = maxPrice;
 		String rent_type = rentType;
 	    
+		switch(area) {
+		case "서대문구 대현동":
+			area_view = "daehyun_dong";
+			break;
+		case "서대문구 신촌동":
+			area_view = "sinchon_dong";
+			break;
+		case "은평구 신사동":
+			area_view = "sinsa_dong";
+			break;
+		case "마포구 연남동":
+			area_view = "yeonnam_dong";
+			break;
+			
+		}
+		
 		try {   Connection conn = DriverManager.getConnection(
 				"jdbc:mysql://localhost:3306/db2022team11", "db2022team11", "db2022team11");
 				
@@ -149,6 +164,10 @@ public class Search extends JFrame{
 	}catch(SQLException se) {
 		se.printStackTrace();
 	}}
+	
+	public static void main(String[] args) {
+		Search search = new Search();
+	}
 
 }
 

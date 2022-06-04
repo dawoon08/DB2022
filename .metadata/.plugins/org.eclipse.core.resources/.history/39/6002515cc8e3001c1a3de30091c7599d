@@ -40,7 +40,7 @@ public class Search extends JFrame{
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new FlowLayout());
 		contentPane.setBackground(new Color(244,244,244));
-	
+		setLocationRelativeTo(null);
 		area_gu = new JComboBox(areaName);
 		contentPane.add(area_gu);
 		
@@ -72,8 +72,6 @@ public class Search extends JFrame{
 		
 		setSize(700, 700); 
 		setVisible(true);
-		setLocationRelativeTo(null);
-		
 	}
 	
 	private class MyActionListener implements ActionListener{
