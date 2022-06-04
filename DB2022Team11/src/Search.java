@@ -115,16 +115,16 @@ public class Search extends JFrame{
 	    
 		switch(area) {
 		case "서대문구 대현동":
-			area_view = "daehyun_dong";
+			area_view = "DB2022_daehyun_dong";
 			break;
 		case "서대문구 신촌동":
-			area_view = "sinchon_dong";
+			area_view = "DB2022_sinchon_dong";
 			break;
 		case "은평구 신사동":
-			area_view = "sinsa_dong";
+			area_view = "DB2022_sinsa_dong";
 			break;
 		case "마포구 연남동":
-			area_view = "yeonnam_dong";
+			area_view = "DB2022_yeonnam_dong";
 			break;
 			
 		}
