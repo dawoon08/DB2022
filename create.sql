@@ -59,8 +59,8 @@ CREATE TABLE DB2022_SALE (
 );
 
 create index price_index on DB2022_SALE(price);
-create index area_index on DB2022_AREA(area_id);
 create index agency_index on DB2022_AGENCY(agency_id);
+create index rent_type_index on DB2022_SALE(rent_type);
 create index building_index on DB2022_BUILDING(building_id);
 
 insert into DB2022_AREA values ('Lid001', '서대문구', '대현동'),
